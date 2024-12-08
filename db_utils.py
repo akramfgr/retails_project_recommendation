@@ -14,21 +14,29 @@ def load_data():
         SELECT InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, Country, TotalPrice 
         FROM transactions
     """
-    data = pd.read_sql(query, conn)
-    conn.close()
-    data['InvoiceDate'] = pd.to_datetime(data['InvoiceDate'], errors='coerce')
-    data = data.dropna(subset=['InvoiceDate'])  # Drop rows with invalid dates
-    data['Country'] = data['Country'].fillna("Unknown")
+    try:
+        data = pd.read_sql(query, conn)
+        data['InvoiceDate'] = pd.to_datetime(data['InvoiceDate'], errors='coerce')
+        data = data.dropna(subset=['InvoiceDate'])  # Drop rows with invalid dates
+        data['Country'] = data['Country'].fillna("Unknown")
+    finally:
+        conn.close()
     return data
 
-def insert_transaction(invoice_no, stock_code, description, quantity, invoice_date, unit_price, customer_id, total_price, country="Unknown"):
-    """Insert a new transaction into the database."""
+def insert_transactions(transactions):
+    """Insert multiple transactions into the database."""
     conn = connect_db()
-    cursor = conn.cursor()
-    query = """
-        INSERT INTO transactions (InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, Country, TotalPrice)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """
-    cursor.execute(query, (invoice_no, stock_code, description, quantity, invoice_date, unit_price, customer_id, country, total_price))
-    conn.commit()
-    conn.close()
+    try:
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO transactions (InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, Country, TotalPrice)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        print("Transactions to insert:", transactions)  # Debugging output
+        cursor.executemany(query, transactions)
+        conn.commit()
+    except Exception as e:
+        print(f"Unexpected error: {e}")  # Broader exception handling
+    finally:
+        conn.close()
+
