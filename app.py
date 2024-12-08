@@ -80,6 +80,8 @@ if submitted:
     col_left, col_right = st.columns(2)
 
     # Left: RFM Metrics and Customer Profile
+    # Left: RFM Metrics and Customer Profile
+    # Left: RFM Metrics and Customer Profile
     with col_left:
         st.subheader("Customer RFM Metrics and Profile")
         if not customer_rfm.empty:
@@ -87,7 +89,25 @@ if submitted:
             profile = customer_rfm['Profile'].values[0]
             st.info(f"Predicted Customer Profile: **{profile}**")
         else:
-            st.warning("No RFM metrics available for this customer.")
+            #st.warning("No RFM metrics available for this customer.")
+            #st.info("Calculating RFM metrics for the new customer based on form inputs...")
+
+            # Dynamically calculate RFM metrics for the new customer
+            rfm_calculator = RFMMetrics()
+            new_customer_rfm = rfm_calculator.calculate_rfm_for_new_customer(
+                unit_price=unit_price,
+                quantity=quantity,
+                invoice_date=invoice_date
+            )
+
+            # Convert the new customer RFM metrics to a DataFrame for tabular display
+            new_customer_rfm_df = pd.DataFrame([new_customer_rfm])
+
+            # Display calculated RFM metrics as a table
+            st.table(new_customer_rfm_df)
+
+            # Display default profile information
+            st.info("This customer is categorized as 'New' since this is their first transaction.")
 
     # Right: Recommendations
     with col_right:

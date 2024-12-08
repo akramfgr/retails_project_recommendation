@@ -2,7 +2,7 @@ import sqlite3
 import pandas as pd
 
 # Load the cleaned dataset
-file_path = 'cleaned_online_retail.csv'  # Replace with your cleaned dataset file
+file_path = 'cleaned_dataset.csv'  # Replace with your cleaned dataset file
 data = pd.read_csv(file_path)
 
 # Connect to SQLite and save the data

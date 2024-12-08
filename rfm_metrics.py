@@ -70,6 +70,35 @@ class RFMMetrics:
             logger.error(f"Error calculating RFM metrics: {str(e)}")
             raise
 
+    def calculate_rfm_for_new_customer(self, unit_price, quantity, invoice_date, reference_date=None):
+        """
+        Calculate RFM metrics for a new customer dynamically based on form inputs.
+        Args:
+            unit_price (float): Unit price of the product.
+            quantity (int): Quantity purchased.
+            invoice_date (datetime.date): Date of the transaction.
+            reference_date (datetime.date, optional): Reference date for recency calculation.
+                                                      Defaults to today's date.
+
+        Returns:
+            dict: RFM metrics for the new customer.
+        """
+        if reference_date is None:
+            reference_date = pd.Timestamp.today()
+
+        recency = (reference_date - pd.Timestamp(invoice_date)).days
+        frequency = 1  # New customer has only one transaction
+        monetary = unit_price * quantity
+
+        return {
+            "Recency": recency,
+            "Frequency": frequency,
+            "Monetary": monetary,
+            "LogRecency": np.log1p(recency),
+            "LogFrequency": np.log1p(frequency),
+            "LogMonetary": np.log1p(monetary)
+        }
+
     def predict_customer_profile(self, rfm_data):
         """Predict customer profiles based on RFM metrics using KMeans clustering."""
         # Use only the numeric RFM columns
