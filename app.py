@@ -104,7 +104,7 @@ if submitted:
             new_customer_rfm_df = pd.DataFrame([new_customer_rfm])
 
             # Display calculated RFM metrics as a table
-            st.table(new_customer_rfm_df)
+            st.table(new_customer_rfm_df[['Recency', 'Frequency', 'Monetary']])
 
             # Display default profile information
             st.info("This customer is categorized as 'New' since this is their first transaction.")
